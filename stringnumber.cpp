@@ -44,6 +44,33 @@ namespace scientific {
                 longEnd = lhs.crend();
             }
         }
+
+        int updateNumber(int number, bool& shift, bool& negative)
+        {
+          if (shift && !negative) {
+            ++number;
+          } else if (shift && negative) {
+            --number;
+          }
+
+          number %= '0';
+          number += '0';
+
+          if (number < '0') {
+            number += 10;
+            shift = true;
+            negative = true;
+          } else if (number > '9') {
+            number -= 10;
+            shift = true;
+            negative = false;
+          } else {
+            shift = false;
+            negative = false;
+          }
+
+          return number;
+        }
     }
 
     bool StringNumber::isNull() const {
@@ -113,28 +140,7 @@ namespace scientific {
                 sum = rch - lch;
             }
 
-            if (shift && !negative) {
-                ++sum;
-            } else if (shift && negative) {
-                --sum;
-            }
-
-            sum %= '0';
-            sum += '0';
-            if (sum > '9') {
-                sum -= 10;
-                shift = true;
-                negative = false;
-            } else if (sum < '0') {
-                sum += 10;
-                shift = true;
-                negative = true;
-            } else {
-                negative = false;
-                shift = false;
-            }
-
-            return (char) sum;
+            return updateNumber(sum, shift, negative);
         };
 
         StringNumber result;
@@ -142,27 +148,7 @@ namespace scientific {
                        sumSymbolicDigits);
 
         for (auto it = longBeginAppend; it != longEnd; ++it) {
-            int sum = *it;
-            if (shift && !negative) {
-                ++sum;
-            } else if (shift && negative) {
-                --sum;
-            }
-
-            if (sum < '0') {
-                sum += 10;
-                shift = true;
-                negative = true;
-            } else if (sum > '9') {
-                sum -= 10;
-                shift = true;
-                negative = false;
-            } else {
-                shift = false;
-                negative = false;
-            }
-
-            result.push_back(sum);
+            result.push_back(updateNumber(*it, shift, negative));
         }
 
         if (shift) {
